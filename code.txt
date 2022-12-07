@@ -1,0 +1,940 @@
+#include Wire.h 
+#include LiquidCrystal_I2C.h
+#include dhtnew.h
+#include DS3231.h
+#include IRremote.h
+RTClib RTC;
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+DHTNEW mySensor(13);  вологості
+IRrecv irrecv(8);  указываем вывод, к которому подключен приемник
+decode_results results;
+------ 
+int out1=7; куллер
+int out2=6;  земля
+int out3=5;  температура
+int out4=4;  вологість
+int outL=A0;  освітлення  A0
+------
+int sensL;
+int sensG;
+int sensT;
+int sensH;
+------
+int h;           200507w234900x for time setting
+int m;
+int s;
+int d;
+int mm;
+int y;
+------
+int butt1;
+int butt2;
+int butt3;
+int bu1=10;  12
+int bu2=3; 11
+int bu3=2;
+int pot;  (a1)
+int po=A1;
+int sG=A3;
+int sL=A2;
+unsigned long last_time;
+unsigned long  lastread2;
+byte display=1;
+boolean trig1=false;
+boolean trig2=false;
+boolean trig3=false;
+int L1=200;
+int G1=200;
+int H0=1;
+int H1=10;
+int T0=1;
+int T1=10;
+int i=0;
+int num=0;
+int TMAX1=50;
+int TMAX0=1;
+int Gtime1=10;
+int Gtime0=1;
+int Lvalue=800;
+int t1=0;5
+int t2=22;
+int tt=0;
+int ttt=0;
+ byte simvol[8] = {0b01100,0b10010,0b10010,0b01100,0b00000,0b00000,0b00000,0b00000};   градус
+ byte simvol2[8] = {0b00100,0b10101,0b01110,0b11111,0b01110,0b10101,0b00100,0b00000};    сонце
+ byte simvol3[8] = {0x0,0xE,0x1F,0x1F,0xE,0xE,0x4,0x0};  капля
+ byte simvol4[8] = {0x0,0x4,0x6,0x1F,0x1F,0x6,0x4,0x0};   --
+ byte simvol5[8] = {0x0,0x4,0xC,0x1F,0x1F,0xC,0x4,0x0};   --
+ byte simvol6[8] = {0x0,0x0,0xA,0x15,0x0,0xA,0x15,0x0};   waves
+ byte simvol7[8] = {0x0,0x4,0xE,0xE,0xE,0x1F,0x4,0x0};   bell
+ byte simvol8[8] = {0x0,0x0,0x1,0x3,0x7,0xF,0x1F,0x0};   level
+ void setup() { 
+  lcd.begin();
+  lcd.backlight();
+  Wire.begin();
+  Serial.begin (9600); 
+  pinMode(bu1,INPUT);
+  pinMode(bu2,INPUT);
+  pinMode(bu3,INPUT);
+  pinMode(po,INPUT);
+  pinMode(9,INPUT); 
+  pinMode(out1, OUTPUT); 
+  pinMode(out2, OUTPUT);
+  pinMode(out3, OUTPUT);
+  pinMode(out4, OUTPUT); 
+  pinMode(outL, OUTPUT);
+  irrecv.enableIRIn();  запускаем прием
+  mySensor.setHumOffset(10);    калібрування значення вологості +10%
+  mySensor.setTempOffset(-1.5);  калібрування значення температури -1.5 градуса
+  -------------------------------------------------------------------
+lcd.createChar(1, simvol);
+lcd.createChar(2, simvol2);
+lcd.createChar(3, simvol3);
+lcd.createChar(4, simvol4);
+lcd.createChar(5, simvol5);
+lcd.createChar(6, simvol6);
+lcd.createChar(7, simvol7);
+lcd.createChar(8, simvol8);
+----------------------
+lcd.setCursor(0,0);
+lcd.print(Diploma Project);
+lcd.setCursor(0,1);
+lcd.print(by );
+lcd.write(4);
+lcd.print( Den KOS );
+lcd.write(5);
+delay(1000);
+  lcd.setCursor(0,0);
+  lcd.print(                );  печатаем текст
+  lcd.setCursor(0,1);
+  lcd.print(                );  печатаем текст
+Serial.available();
+} 
+ void loop() { 
+ if ( irrecv.decode( &results )) {  если данные пришли
+    switch ( results.value ) {
+    case 0xFFE21D
+        funDisp(1);
+        break;
+    case 0xFFA25D
+        funDisp(-1);
+        break;
+    }    
+    irrecv.resume();  принимаем следующую команду
+  }
+
+  --------------------------------------------
+  butt1=digitalRead(bu1);  
+  butt2=digitalRead(bu2);  
+  butt3=digitalRead(bu3);  
+  pot=analogRead(po);  
+          Serial.print(butt1);
+          Serial.print(-);
+          Serial.print(butt2);
+          Serial.print(-);
+          Serial.print(butt3);
+          Serial.print(-);
+          Serial.print(pot);
+          Serial.println(  waiting mode);
+   pot=Serial.parseInt();
+  analogWrite(outL,pot);
+  Serial.println(pot);
+            if (butt3==LOW && trig3==true){ 
+           trig3=false; }
+   Serial.print(butt1);
+ Serial.print(---);
+ Serial.println(butt2);
+  Serial.print(---);
+  Serial.println(display);
+ if (butt3==HIGH && trig3==false && display==1 ){     меню налаштування мінімума for sensors
+     trig3=true; 
+      i=1; 
+      num=1;  
+       lcd.setCursor(2,0);
+       lcd.print(H1);
+       lcd.print(!);  печатаем текст
+       lcd.setCursor(6,0);  устанавливаем курсор
+       lcd.write(5);
+       lcd.setCursor(10,0);
+       lcd.print(T1);
+       lcd.print(!);
+       lcd.print( );
+       lcd.setCursor(2,1);
+       lcd.print(L1);
+       lcd.print(!);
+       lcd.print( );
+       lcd.setCursor(10,1);
+       lcd.print(G1);
+       lcd.print(!);
+                  }
+    while (i==1) {                            режим налаштування
+        butt1=digitalRead(bu1);
+        butt2=digitalRead(bu2);
+        butt3=digitalRead(bu3);
+          Serial.print(butt1);
+          Serial.print(-);
+          Serial.print(butt2);
+          Serial.print(-);
+          Serial.print(butt3);
+          Serial.print(-);
+          Serial.print(pot);
+          Serial.println(  settings mode);
+      if (butt3==LOW && trig3==true){
+           trig3=false; }
+------------------------------------------------------------------------------------------------------------------------------ стрелочки
+      if (butt2==HIGH && trig2==false){            -----
+            trig2=true; 
+            num-=1;
+            solo_mid();
+           }
+           Serial.println(num);
+         if (butt2==LOW && trig2==true){
+           trig2=false; }
+           if (butt1==HIGH && trig1==false){          +++++
+            trig1=true; 
+            num+=1;
+            solo_mid();
+         }
+           if (butt1==LOW && trig1==true){ 
+           trig1=false; }
+        switch (num) {
+        case 1
+           lcd.setCursor(6,0);  устанавливаем курсор
+           lcd.write(5);
+           num=1;
+             break;
+        case 2
+           lcd.setCursor(7,0);  устанавливаем курсор
+           lcd.write(4);
+           num=2;
+             break;
+        case 3
+           lcd.setCursor(6,1);  устанавливаем курсор
+           lcd.write(5);
+           num=3;
+             break;
+        case 4
+           lcd.setCursor(7,1);  устанавливаем курсор
+           lcd.write(4);
+           num=4;
+             break;             
+        }  
+------------------------------------------------------------------------------------------------------------------------------------------------- 
+        if (butt3==HIGH && trig3==false && num==1 ) {      налаштування вологості
+          trig3=true;   
+          
+          clear();   use function at the bottom
+         lcd.setCursor(1,0);
+         lcd.print(Please set min);
+         lcd.setCursor(2,1);
+         lcd.print(humidity);
+         lcd.setCursor(12,1);
+         lcd.print(%);
+         i=2;
+        }
+        while (i==2) {
+        butt1=digitalRead(bu1);
+        butt2=digitalRead(bu2);
+        butt3=digitalRead(bu3);
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+          Serial.print(H0);
+          Serial.println(H0);
+          lcd.print(%);
+ H0=select(H0);    вибираємо кейс
+           Serial.print(T0);
+          Serial.println(T0);
+         H1=select2(H0);           КЕЙСИ  
+       selectConfirm(H1,humidity is , %);     
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+   if (butt3==HIGH && trig3==false && num==2) {      налаштування temp
+          trig3=true;   
+          clear();   use function at the bottom
+         lcd.print(Please set min);
+         lcd.setCursor(0,1);
+         lcd.print(temperature);
+         lcd.setCursor(12,1);
+         lcd.print(T1);
+         lcd.write(1);
+         lcd.print(C);
+         i=3;
+        }
+        while (i==3) {
+        butt1=digitalRead(bu1);
+        butt2=digitalRead(bu2);
+        butt3=digitalRead(bu3);
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+         T0=select(T0);    вибираємо кейс (збільшуємозменшуємо т0)
+           Serial.print(T0);
+          Serial.println(T0);
+         T1=select2(T0);           КЕЙСИ  і визначення т1
+         selectConfirm(T1,temperature, C);                     це ПРОСТО ГЕНІАЛЬНО   ХТО ВИЙШОВ З ЦИКЛУ І НЕ ЗАКРИВ ЗА СОБОЮ ДВЕРІ(тригер)
+ }
+-----------------------------------------------------------------------------------------------------------------------------------------  
+       if (butt3==HIGH && trig3==false && num==3 ) {      налаштування світла
+          trig3=true;   
+           Serial.println(mmm);
+          clear();   use function at the bottom
+         lcd.setCursor(1,0);
+         lcd.print(Please set min);
+         lcd.setCursor(2,1);
+         lcd.print(light);
+         lcd.setCursor(12,1);
+         lcd.write(2);
+         i=4;
+        }
+        while (i==4) {
+        butt3=digitalRead(bu3);
+        pot=analogRead(po);
+        Serial.println(pot);
+      
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+           L1=pot;
+           lcd.setCursor(9,1);
+           lcd.print(L1); 
+           lcd.write(2);
+           delay(140);      
+          selectConfirm(pot,light is , ..);     
+}
+----------------------------------------------------------------------------------------------------------------------------------------
+       if (butt3==HIGH && trig3==false && num==4 ) {      налаштування ВОЛОГОСТІ ГРУНТУ
+          trig3=true;   
+           Serial.println(mmm);
+          clear();   use function at the bottom
+         lcd.setCursor(1,0);
+         lcd.print(Please set min);
+         lcd.setCursor(2,1);
+         lcd.print(gndHum);
+         lcd.setCursor(12,1);
+         lcd.write(3);
+         i=5;
+        }
+        while (i==5) {
+        butt3=digitalRead(bu3);
+        pot=analogRead(po);
+        Serial.println(pot);
+      
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+           G1=pot;
+           lcd.setCursor(9,1);
+           lcd.print(G1); 
+           lcd.write(3);
+           delay(140);      
+          selectConfirm(pot,gndHum is , .);     
+}
+    }   режим налаштувань ^^^^^^^^ кінець
+-----------------------------------------------------------------------------------------------------------------------------------------
+  if (butt1==HIGH && trig1==false){               ПЕРЕХІД МІЖ ДИСПЛЕЯМИ
+   funDisp(1);
+  }
+if (butt1==LOW && trig1==true){ 
+  trig1=false;
+  }
+  if (butt2==HIGH && trig2==false){
+   funDisp(-1);
+  }
+if (butt2==LOW && trig2==true){ 
+  trig2=false;
+  }
+  ---------------------------------------------------------------
+if (millis() - last_time  1000){
+   last_time=millis();
+    DateTime now = RTC.now();
+     
+    Serial.print(now.year(), DEC);
+    Serial.print('');
+    Serial.print(now.day(), DEC);
+    Serial.print('');
+    Serial.print(now.month(), DEC);
+    Serial.print(' ');
+    Serial.print(now.hour(), DEC);
+    Serial.print('');
+    Serial.print(now.minute(), DEC);
+   Serial.print('');
+    Serial.print(now.second(), DEC);
+   Serial.println();
+    
+d= now.day();
+mm=now.month();
+y=now.year();
+h=(now.hour());
+m=now.minute();
+s=now.second();
+Serial.print(d);
+Serial.print('');
+Serial.print(mm);
+Serial.print('');
+Serial.print(y);
+Serial.print(  );
+Serial.print(h);
+Serial.print('');
+Serial.print(m);
+Serial.print('');
+Serial.println(s);
+}
+-----------------------------------------------
+sensT=mySensor.getTemperature();
+sensH=mySensor.getHumidity();
+ Serial.println(sensT);
+ Serial.println(sensH);
+  sensG=analogRead(sG);
+  Serial.println(sensG);
+  sensL=analogRead(sL);
+  Serial.println(sensL);
+if (sensL=L1  && h=t1 && h=t2 )                   світло   && h=6 && h=22
+  {
+    analogWrite(outL,Lvalue);                        аут1 -це кулер
+    }
+  else
+  {
+   analogWrite(outL,LOW);
+    };
+        if (sensT=TMAX1)                                     робота куллера
+   {
+   digitalWrite(out1,HIGH);
+     }
+    else
+   {
+     digitalWrite(out1,LOW);
+     };
+    if (sensG=500)                                         вологість землі
+   {
+   digitalWrite(out2,HIGH);
+     }
+    else
+   {
+     digitalWrite(out2,LOW);
+     };
+  if (T1sensT)                                                  температура
+   {
+   digitalWrite(out3,HIGH);
+     }
+    else
+   {
+     digitalWrite(out3,LOW);
+     };
+      if (H1sensH)                                               вололгість
+   {
+   digitalWrite(out4,HIGH);
+     }
+    else
+   {
+     digitalWrite(out4,LOW);
+     };
+-----------------------------------------------------------------------------------------------------------------
+  switch (display) {
+case 1
+ if (millis() - mySensor.lastRead()  1000)   first screen
+  {
+    mySensor.read();
+    Serial.print(mySensor.getHumidity(), 1);
+    Serial.print(t);
+    Serial.println(mySensor.getTemperature(), 1);
+     lcd.setCursor(8,0);  устанавливаем курсор
+     lcd.print(   ); в мусорку
+     lcd.print(T);  печатаем текст
+     lcd.print(mySensor.getTemperature(),1); выводим на lcd 
+     lcd.setCursor(14,0);  устанавливаем курсор
+     lcd.print(char(1));  печатаем символ на первой строке   або lcd.write(223);
+     lcd.print(C);
+     lcd.setCursor(0,0);  устанавливаем курсор
+     lcd.print(   ); в мусорку
+     lcd.print(H);  печатаем текст
+     lcd.print(sensH ); выводим на lcd   lcd.print(mySensor.getHumidity(), 1 );
+     lcd.setCursor(5,0);  устанавливаем курсор
+     lcd.print(%);  печатаем текст
+     lcd.setCursor(4,1);
+     lcd.print( ); в мусорку
+     lcd.setCursor(0,1);  устанавливаем курсор
+     lcd.print(L);  печатаем текст
+     lcd.print(sensL); выводим на lcd
+     lcd.setCursor(5,1);  устанавливаем курсор
+     lcd.print(char(2)); 
+     lcd.setCursor(13,1);
+     lcd.print( ); в мусорку
+     lcd.setCursor(8,1);  устанавливаем курсор
+     lcd.print(G);  печатаем текст
+     lcd.print(sensG); выводим на lcd
+     lcd.setCursor(14,1);  устанавливаем курсор
+     lcd.write(3); lcd.print(char(3));
+  }
+  break;
+  case 2
+   if (millis() - lastread2  1000){   second screen
+     lastread2=millis(); lastread2=millis();
+     lcd.setCursor(4,0);
+     lcd.print(h);
+     lcd.print('');
+     lcd.print(m);
+     lcd.print('');
+     lcd.println(s);
+     lcd.setCursor(11,0);    
+     lcd.print(d);
+     lcd.print('');
+     lcd.print(mm);
+  lcd.setCursor(0,1);
+  lcd.print( );  печатаем текст
+  lcd.write(8);
+  lcd.write(6);
+  lcd.print(  );
+  lcd.write(2);
+  lcd.write(7);
+  lcd.print(  );
+  lcd.write(8);
+  lcd.write(2);
+  lcd.print(  ); 
+  lcd.write(3);
+  lcd.write(7);
+  lcd.print( );
+ }
+ break;
+    }
+-------------------------------------------------------------------------------------------------------------------------------
+if (butt3==HIGH && trig3==false && display==2 ){     меню налаштування мінімума for sensors    display 2
+     trig3=true; 
+      i=1; 
+      num=1;}
+      Serial.println(pps);
+while (i==1) {                            режим налаштування
+        butt1=digitalRead(bu1);
+        butt2=digitalRead(bu2);
+        butt3=digitalRead(bu3);
+      if (butt3==LOW && trig3==true){
+           trig3=false; }
+---------------------- вибір параметру (час провітрювання, час поливу--, час ввімкнення світла, яскравість світла)
+           if (butt2==HIGH && trig2==false){            -----
+            trig2=true; 
+            num-=1;
+           }
+            if (butt2==LOW && trig2==true){
+           trig2=false; }
+           if (butt1==HIGH && trig1==false){          +++++
+            trig1=true; 
+            num+=1;     
+          }
+           if (butt1==LOW && trig1==true){ 
+           trig1=false; }
+           if (num=0) {num=1;}
+           if (num=5) {num=4;}
+-----------------
+        switch (num) {
+        case 1
+           if (millis() - lastread2  1000){   second screen
+             lastread2=millis(); lastread2=millis();
+             lcd.setCursor(1,1);
+               lcd.write(8);
+               lcd.write(6);
+              }
+                if (millis() - lastread2 700){
+                lcd.setCursor(1,1);
+                lcd.print(  );
+                 }
+                  if (millis() - lastread2 300 ){
+                lcd.setCursor(1,1);
+                lcd.print(TMAX1);
+                 }
+             break;
+        case 2
+           if (millis() - lastread2  1000){   second screen
+             lastread2=millis(); lastread2=millis();
+             lcd.setCursor(5,1);
+               lcd.write(2);
+               lcd.write(7);
+              }
+                if (millis() - lastread2 500){
+                lcd.setCursor(5,1);
+                lcd.print(  );
+                 }                
+             break;
+        case 3
+           if (millis() - lastread2  1000){   second screen
+             lastread2=millis(); lastread2=millis();
+             lcd.setCursor(9,1);
+               lcd.write(8);
+               lcd.write(2);
+              }
+              if (millis() - lastread2 500){
+                lcd.setCursor(9,1);
+                lcd.print(  );
+                 }
+             break;
+        case 4
+            if (millis() - lastread2  1000){   second screen
+             lastread2=millis(); lastread2=millis();
+             lcd.setCursor(13,1);
+               lcd.write(3);
+               lcd.write(7);
+              }
+                  if (millis() - lastread2 300 ){
+                lcd.setCursor(13,1);
+                lcd.print(Gtime1);
+                 }           
+        }  
+------------------------------------------------------------------------------------------------------------------------------------------------- 
+        if (butt3==HIGH && trig3==false && num==1 ) {      налаштування макс температури щоб вкл куллер  TMAX1 
+          trig3=true;   
+          clear();   use function at the bottom
+         lcd.setCursor(1,0);
+         lcd.print(Please set max);
+         lcd.setCursor(0,1);
+         lcd.print(temperature);
+         lcd.print(  );
+         lcd.write(1);
+         lcd.print(C);
+         i=2;
+        }
+        while (i==2) {
+        butt1=digitalRead(bu1);
+        butt2=digitalRead(bu2);
+        butt3=digitalRead(bu3);
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+        TMAX0=select(TMAX0);    вибираємо кейс
+           Serial.print(TMAX0);
+          Serial.println(TMAX0);
+         TMAX1=select2(TMAX0);           КЕЙСИ  
+         selectConfirm2(TMAX1,Maximum,temperature, C);     
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+        if (butt3==HIGH && trig3==false && num==4 ) {      таймер поливу    Gtime1
+          trig3=true;   
+          clear();   use function at the bottom
+         lcd.setCursor(1,0);
+         lcd.print(Set time for);
+         lcd.setCursor(0,1);
+         lcd.print(water pump   );
+         lcd.print(s);
+         i=3;
+        }
+        while (i==3) {
+        butt1=digitalRead(bu1);
+        butt2=digitalRead(bu2);
+        butt3=digitalRead(bu3);
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+        Gtime0=select(Gtime0);    вибираємо кейс
+           Serial.print(TMAX0);
+          Serial.println(TMAX0);
+         Gtime1=select2(Gtime0);           КЕЙСИ  
+         selectConfirm2(Gtime1,Time of,watering is , s); 
+        }
+---------------------------------------------------------------------------------------------------------
+       if (butt3==HIGH && trig3==false && num==3 ) {      налаштування інтенсивності світла
+          trig3=true;   
+           Serial.println(mmm);
+          clear();   use function at the bottom
+         lcd.setCursor(0,0);
+         lcd.print(Please set level);
+         lcd.setCursor(2,1);
+         lcd.print(of light);
+         lcd.setCursor(14,1);
+         lcd.write(2);
+         i=4;
+        }
+        while (i==4) {
+        butt3=digitalRead(bu3);
+        pot=analogRead(po);
+        Serial.println(pot);
+        analogWrite(outL,pot);
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+           Lvalue=pot;
+           lcd.setCursor(11,1);
+           lcd.print(Lvalue);
+           lcd.write(2);
+           delay(140);      
+          selectConfirm2(pot,Level of, light is , ..);  
+        }
+---------------------------------------------------------------------------------------------------------
+       if (butt3==HIGH && trig3==false && num==2 ) {      налаштування таймеру світла
+          trig3=true;   
+           Serial.println(mmm);
+          clear();   use function at the bottom
+         lcd.setCursor(0,0);
+         lcd.print(Please set light);
+         lcd.setCursor(2,1);
+         lcd.print(time);
+         lcd.setCursor(15,1);
+         lcd.write(2);
+         i=5;
+        }
+        while (i==5) {
+        butt1=digitalRead(bu1);
+        butt2=digitalRead(bu2);
+        butt3=digitalRead(bu3);
+         pot=analogRead(po);
+       if (butt3==LOW && trig3==true){ 
+           trig3=false;}
+              if (butt1==HIGH && trig1==false){
+            trig1=true;
+          tt+=1;
+            }
+           if (butt1==LOW && trig1==true){ 
+           trig1=false;
+           }
+           if (butt2==HIGH && trig2==false){
+            trig2=true;
+          tt-=1;
+            }
+           if (butt2==LOW && trig2==true){ 
+           trig2=false;
+           }
+  if (tt0){tt=0;}
+ else if (tt=24){ tt=23;}
+ if (pot100){
+       lcd.setCursor(8,1);
+       lcd.print(   );
+       lcd.setCursor(8,1);
+       lcd.print(tt);
+       lcd.print(h);
+       t1=tt ;
+ }
+ else if (pot700){
+        lcd.setCursor(11,1);
+       lcd.print(   );
+        lcd.setCursor(11,1);
+        lcd.print(-);
+       lcd.print(tt);
+       lcd.print(h);
+       t2=tt ;
+     }
+        if (butt3==HIGH && trig3==false ) {      підтвердження мін часу 
+          trig3=true;
+           if (t1=t2) {
+            clear();
+         lcd.setCursor(6,0);  устанавливаем курсор
+        lcd.print(ERROR);
+        lcd.setCursor(0,1);  устанавливаем курсор
+        lcd.print(set correct time);
+        delay(1000);
+        clear();
+        lcd.setCursor(0,0);
+         lcd.print(Please set light);
+         lcd.setCursor(2,1);
+         lcd.print(time);
+         lcd.setCursor(15,1);
+         lcd.write(2);
+                       }
+         else {           
+           clear();
+          lcd.setCursor(1,0);
+        lcd.print(OK! Light time );
+        lcd.setCursor(0,1);  устанавливаем курсор
+        lcd.print(form );
+        lcd.print(t1);
+        lcd.print(h to );
+        lcd.print(t2);
+        lcd.print(h);
+        lcd.print(  );
+        lcd.write(2);
+         delay(2000);
+         clear();
+          i=0;
+         }
+         }
+           if (butt3==LOW && trig3==true){ 
+           trig3=false; }
+        }
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+}  
+    delay(100);
+}      кІнець лупу і початок функцій
+void funDisp(int x){
+display=display+x;
+     trig1=true;
+  lcd.setCursor(0,0);
+  lcd.print(                );  печатаем текст
+  lcd.setCursor(0,1);
+  lcd.print(                );  печатаем текст
+-------------------------------------------------------------
+if (display==3)
+{
+  display=2;
+    Serial.print(out of max range of display);
+  }
+ else if (display==0)
+{
+  display=1;
+  Serial.print(out of min range of display);
+  }
+    }
+void clear (){
+  lcd.setCursor(0,0);
+  lcd.print(                );  печатаем текст
+  lcd.setCursor(0,1);
+  lcd.print(                );  печатаем текст
+  lcd.setCursor(0,0);
+  }
+int select(int x) {
+       if (butt1==HIGH && trig1==false){
+            trig1=true;
+          x+=1;
+            }
+           if (butt1==LOW && trig1==true){ 
+           trig1=false;
+           }
+           if (butt2==HIGH && trig2==false){
+            trig2=true;
+          x-=1;
+            }
+           if (butt2==LOW && trig2==true){ 
+           trig2=false;
+           }
+  if (x=0)
+{
+  x=1;
+  Serial.print(out of min range of choosing parametrs);
+  }
+ else if (x14)
+{
+  x=14;
+  Serial.print(out of max range of choosing parametrs);
+  }
+         delay(100);
+      Serial.println(x);
+       return(x); 
+}
+int select2 (int x) {
+         switch (x) {
+case 1
+lcd.setCursor(13,1);
+lcd.print( );
+lcd.setCursor(12,1);  
+lcd.print(5);
+y=5;
+break;
+case 2
+lcd.setCursor(12,1);  
+lcd.print(10);
+y=10;
+break;
+case 3
+lcd.setCursor(12,1);  
+lcd.print(15);
+y=15;
+break;     
+case 4
+lcd.setCursor(12,1);  
+lcd.print(20);
+y=20;
+break;
+case 5
+lcd.setCursor(12,1);  
+lcd.print(25);
+y=25;
+break; 
+case 6
+lcd.setCursor(12,1);  
+lcd.print(30);
+y=30;
+break;  
+case 7
+lcd.setCursor(12,1);  
+lcd.print(35);
+y=35;
+break;  
+case 8
+lcd.setCursor(12,1);  
+lcd.print(40);
+y=40;
+break;  
+case 9
+lcd.setCursor(12,1);  
+lcd.print(45);
+y=45;
+break;  
+case 10
+lcd.setCursor(12,1);  
+lcd.print(50);
+y=50;
+break; 
+case 11
+lcd.setCursor(12,1);  
+lcd.print(55);
+y=55;
+break; 
+case 12
+lcd.setCursor(12,1);  
+lcd.print(60);
+y=60;
+break; 
+case 13
+lcd.setCursor(12,1);  
+lcd.print(65);
+y=65;
+break; 
+case 14
+lcd.setCursor(12,1);  
+lcd.print(70);
+y=70;
+break; 
+          }
+    return y;      
+}
+void selectConfirm (int x, char ms[], char mt[]) {
+   if (butt3==HIGH && trig3==false){      підвердження мін 
+        clear();
+        trig3==true;
+        lcd.setCursor(3,0);
+        lcd.print(OK! Minimum );
+        lcd.setCursor(0,1);  устанавливаем курсор
+        lcd.print(ms);
+        lcd.print(x);
+        if(i==4){                               малює сонечко при підтверджені освітлення
+          lcd.write(2);
+          }
+           if(i==5){                          малює каплю при підтверджені вологості грунту
+          lcd.write(3);
+          }
+        lcd.print(mt);
+         delay(1000);
+         clear();
+          i=0;
+         }
+           if (butt3==LOW && trig3==true){ 
+           trig3=false;
+            }
+}
+void selectConfirm2 (int x, char mr[],char ms[], char mt[]) {
+   if (butt3==HIGH && trig3==false){      підвердження мін 
+        clear();
+        trig3==true;
+        lcd.setCursor(3,0);
+        lcd.print(OK! );
+        lcd.print(mr);
+        lcd.setCursor(0,1);  устанавливаем курсор
+        lcd.print(ms);
+        lcd.print(x);     
+        if(i==4){                               малює сонечко при підтверджені освітлення
+          lcd.write(2);
+          }
+           if(i==5){                          малює каплю при підтверджені вологості грунту
+          lcd.write(3);
+          }
+        lcd.print(mt);
+         delay(1000);
+         clear();
+          i=0;
+         }
+           if (butt3==LOW && trig3==true){ 
+           trig3=false;    
+            }
+}
+void solo_mid(){
+           lcd.setCursor(6,0);
+           lcd.print(  );  печатаем текст
+           lcd.setCursor(6,1);
+           lcd.print(  );  печатаем текст
+            if (num=0){
+           num=1;
+             }
+            else if (num4){
+            num=4;
+             }
+              }
