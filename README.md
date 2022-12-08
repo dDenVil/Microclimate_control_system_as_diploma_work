@@ -151,22 +151,23 @@ This was very fast review, I didn't even had to translate it, because I did for 
 - Using of female header connertors, that allowed to use sensors, actuartors and MC in other project and change configuration.
 
 **What desicions was bad:**
-- It was working only as stand;
+- It was working only as a stand;
 - Big amount of cheap female header connectors didn't give a stable connection  (falling appart);
 - Splitted PCB on 2 parts (falling appart); 
 - Bad and weak power supplies (it could restart because of "huge" load);
 - Code was such a mess, I didn't use funcions enough;
-- Excessive components (some of them was unnecessary, like IR-remote).
+- Excessive components (some of them was unnecessary, like IR-remote);
+- Paid attention on the look of the menu on the LCD, rather than functionlity.
 
 **How I would do it now:**
-- Change Arduino to ESP8266 (smth that have WI-FI module). And I would have access through telegram bot;
-- Don't try to add everything you can in hardware/software (IR control, SD-card, camera, energy saving, battery mode);
+- Change Arduino to ESP8266 (smth that would have WI-FI module). And I would make access through telegram bot, like I did it in the [PLANT LIFE](https://github.com/dDenVil/Smart_Home_ESP-01_PlantLife);
+- Don't try to add everything you can in the hardware/software (IR control, SD-card, camera, energy saving, battery mode);
 - Choose functionality as small as you can (I mean don't add battery, if supposed to work from grid);
 - Control panel change to encoder;
-- Use EEPROM to save main parameters;
+- Use EEPROM to save main parameters after restart;
 - Don't make compositions of 2 PCB, voltage regulator. Make it all on one board;
 - Use good header connectors;
-- Devide code on few files (main, functions, pics);
+- Devide code on few files (main, functions, pics for lcd);
 - The more simple code the better;
 - Dont' be shy to use resistors;
 - Comment your code;
