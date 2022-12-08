@@ -143,7 +143,7 @@ On one side there will be a hole for a microclimate control device. The glass pa
 
 ## Conclusions
 
-This was very fast review, I didn't even had to translate it, because I did for my Enlish lessons later.    
+This was very fast review, I didn't even had to translate it, because I did for my English lessons later.    
 
 **Let's have a look what choices was good:**
 - It was working;
