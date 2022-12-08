@@ -52,8 +52,10 @@ The board contains from six pins of analog inputs and fourteen or more pins of d
 A microclimate control system will be developed in the **greenhouse box**, as its small size and price of components allow you to assemble this device yourself. But nothing prevents to replace actuators with more serious ones, which work from the 220V network. They will be controlled by a relay or transistor switch, which will change its state (open / closed) from the value at the output of the logic pin of Arduino.
 Let's develop the functional and electric scheme of the device, and also we will collect it on a breadboard.
 ### Development of a functional diagram of the device
-![functional diagram]()
+![functional diagram](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/func.png?raw=true)
+
 `I was lazy to translate it ;D`
+
 The functional diagram shows all the components that are responsible for removing and changing the microclimate, control and display of data. Also on the diagram there are potentially possible devices that are displayed by a dashed line.
 Let's take a closer look at the relationship between each block of the circuit and its connection. For full operation of actuators it is necessary to use a power part, such as a relay or a transistor key. Since the **output of the microcontroller can emit 20 mA** - this is not enough to power the actuators, the maximum for the LED. Therefore, the power part is used, where an external voltage source is connected, both 5 V and 220 V. The advantage of the relay is the so-called galvanic isolation, where the power part is not connected to the logic, in contrast to the transistor switch. But sufficient current is required to power the coil in the relay. But in the case of a transistor, its opening is much less current, and it allows you to control the output voltage by changing it in the range from zero to maximum at the input. Thus, the transistor switch is convenient to use for the lighting mode "Dawn", where the brightness of the lamp increases over time, by analogy with sunrise and sunset.
 To power the modules, it is desirable to use an** external voltage source**, which is mainly 5 V. This will save the service life of the MC.
@@ -72,20 +74,21 @@ where you want to control an electrical circuit with a low power signal and full
 
 ### Program code and its debugging
 
-After creating the electrical circuit, it had to be assembled on a test bench and connect the necessary sensors, which are necessary when working with the code. When writing the code (sketch), first of all, it was necessary to establish a connection with the Arduino Nano. LEDs were used as actuators, which clearly indicated which parameter was changing.
-![pic]()
-![pic2]()
+After creating the electrical circuit, it had to be assembled on a test bench and connect the necessary sensors, which are necessary when working with the code. When writing the code (sketch), first of all, it was necessary to establish a connection with the Arduino Nano. LEDs were used as actuators, which clearly indicated which parameter was changing. Owning the breadboard made my life easier.
+![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/breadb.png?raw=true)
+![pic2](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/screen.png?raw=true)
+
 
 ## CREATING THE PCB FOR THE DEVICE
 The printed circuit board is a special plate on which the electrically conductive circuits of the electronic circuit are placed. This figure is placed on a dielectric substrate, a material that does not conduct current.
 
 When I first designed and diluted the tracks, I tried to place all the components in the area, which was very difficult. After making the board and installing the components, it turned out that some functions did not work, and completely connecting the components was not convenient. Therefore, it was decided to design a new board, which will house the logic part (without relays). So I designed 2 PBC and out of two made one.
 
-![pic]()
-![pic2]()
+![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/Schematics.png?raw=true)
+![pic2](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/pcb1.png?raw=true)
 
 ### Stages in creating a printed circuit board
-![pic]()
+![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/steps.png?raw=true)
 
 Hovever several versions of the boards have been implemented, the drawings of both versions will be used. In general, the process of making a printed circuit board can be divided into the **following stages**:
 - **Forming a photo template**;
@@ -105,13 +108,13 @@ Hovever several versions of the boards have been implemented, the drawings of bo
 -** Site tinning** - this stage was performed by direct mounting of elements on the printed circuit board
 - **Trimming excess textolite** - in my case, this operation was not performed because there is no suitable tool. This stage performs an aesthetic function if there are no requirements for the size of the device.
 
-![pic]()
+![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/ready.png?raw=true)
 
 ### Creating a compact greenhouse box
 
 To complete this project, this box was developed, which will be made of 2 mm thick glass. (baguette), dimensions 266x248x156 mm (WxDxH). It is based on a pentagon with sides of 100 mm, and the sides measuring 210x100 mm.
 
-![pic]()
+![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/greenbox.png?raw=true)
 
 On one side there will be a hole for a microclimate control device. The glass parts will be joined with silicone, which will ensure the tightness and aesthetics of this product. A glass lid will also open for easy access. The result was obtained without a cover, because there was no necessary fastener.
 
