@@ -14,7 +14,7 @@ It is really my Bachelor work, that I made on Arduino Nano. Diploma work was dev
     1. [Development of a functional diagram of the device](#Development-of-a-functional-diagram-of-the-device)
     2. [Program code and its debugging](#Program-code-and-its-debugging)
     3. [Creating of PCB for the device](#Creating-of-PCB-for-the-device)
-    4. [Stages in creating a printed circuit board](#Stages-in-creating-a-printed-circuit-board)
+    4. [Stages of creating a printed circuit board](#Stages-of-creating-a-printed-circuit-board)
     5. [Creating a compact greenhouse box](#Creating-a-compact-greenhouse-box)
 4. [Conclusions](#Conclusions)
     1. What choices was good
@@ -110,7 +110,7 @@ When I first designed and diluted the tracks, I tried to place all the component
 
 [PCB](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/pcb1.png?raw=true)
 
-### Stages in creating a printed circuit board
+### Stages of creating a printed circuit board
 ![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/steps.png?raw=true)
 
 Hovever several versions of the boards have been implemented, the drawings of both versions will be used. In general, the process of making a printed circuit board can be divided into the **following stages**:
