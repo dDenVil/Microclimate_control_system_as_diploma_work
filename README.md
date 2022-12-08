@@ -2,6 +2,26 @@
 
 I will make short review how I made __COMPACT ELECTRONIC MICROCLIMATE MAINTENANCE SYSTEM__, what decisions was good or bad. And how I would do it now.
 It is really my Bachelor work, that I made on Arduino Nano. Diploma work was devided on 3 parts. 25 out of 83 pages was assigned to theory. Developing of system covered  33 pages.
+
+## Table of Contents
+1. [Microclimate](#Microclimate)
+    1. The main indicators of the microclimate
+    2. The appropriate sensor that will measure and actuator responsible for changing these parameter
+    3. OFFICE, HOUSING parameters of the microclimate
+    4. Ranges of parameters
+2. [Arduino platform](#The-Arduino-platform)
+3. [Development of a microclimate control system](#Development-of-a-microclimate-control-system)
+    1. [Development of a functional diagram of the device](#Development-of-a-functional-diagram-of-the-device)
+    2. [Program code and its debugging](#Program-code-and-its-debugging)
+    3. [Creating of PCB for the device](#Creating-of-PCB-for-the-device)
+    4. [Stages in creating a printed circuit board](#Stages-in-creating-a-printed-circuit-board)
+    5. [Creating a compact greenhouse box](#Creating-a-compact-greenhouse-box)
+4. [Conclusions](#Conclusions)
+    1. What choices was good
+    2. What decisions was bad
+    3. How I would do it now
+
+
 ## Microclimate
 Today, with the growth of technological progress, changing environmental conditions is an inevitable process.
 To ensure the most efficient working capacity of employees, employers create the necessary conditions for this. The microclimate is one of the main factors. And for plants, agronomists maintain their microclimate to get the best harvest and ensure their growth.
@@ -41,17 +61,18 @@ Actuators will be controlled mainly by an **electromagnetic relay**, which will 
 
 When choosing an actuator, you must pay attention to its power so that it can maintain the parameters in the range necessary for us.
 
-## Arduino platform
+## The Arduino platform
 Arduino-based devices can receive environmental information through external sensors, and in response to the obtained sensor values, they can control various actuators.
 The microcontroller on the board is programmed using a special programming language, which is a simplified version of C ++ / C. The USB connector is used for programming without the use of special programmers. Direct programming takes place in the Arduino IDE. You can also program the platform using other programs, such as: C ++, Python, Java.
 There is currently a wide variety of Arduino platforms. The most popular are **Arduino Uno** (for its wide functionality) and **Arduino Nano** (for its compactness and price).
 Arduino Nano is one of the smallest Arduino boards. It is a complete analogue of the Arduino Uno - it also works on the ATmega328P chip (although you can still find variants with the ATmega168), but with a smaller form factor. Due to its overall size, the board is often used in projects where compactness is important. There is no separate external power socket on the board, the Arduino works via USB (miniUSB or microUSB). Otherwise, the parameters are the same as the Arduino Uno model.
 The board contains from six pins of analog inputs and fourteen or more pins of digital inputs and outputs, for connection to the microcontroller of necessary electronic devices and schemes.
 
-## DEVELOPMENT OF A MICROCLIMATE CONTROL SYSTEM
+## Development of a microclimate control system
 A microclimate control system will be developed in the **greenhouse box**, as its small size and price of components allow you to assemble this device yourself. But nothing prevents to replace actuators with more serious ones, which work from the 220V network. They will be controlled by a relay or transistor switch, which will change its state (open / closed) from the value at the output of the logic pin of Arduino.
 Let's develop the functional and electric scheme of the device, and also we will collect it on a breadboard.
 ### Development of a functional diagram of the device
+
 ![functional diagram](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/func.png?raw=true)
 
 `I was lazy to translate it ;D`
@@ -76,16 +97,18 @@ where you want to control an electrical circuit with a low power signal and full
 
 After creating the electrical circuit, it had to be assembled on a test bench and connect the necessary sensors, which are necessary when working with the code. When writing the code (sketch), first of all, it was necessary to establish a connection with the Arduino Nano. LEDs were used as actuators, which clearly indicated which parameter was changing. Owning the breadboard made my life easier.
 ![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/breadb.png?raw=true)
-![pic2](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/screen.png?raw=true)
+
+[Screens](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/screen.png?raw=true)
 
 
-## CREATING THE PCB FOR THE DEVICE
+### Creating of PCB for the device
 The printed circuit board is a special plate on which the electrically conductive circuits of the electronic circuit are placed. This figure is placed on a dielectric substrate, a material that does not conduct current.
 
 When I first designed and diluted the tracks, I tried to place all the components in the area, which was very difficult. After making the board and installing the components, it turned out that some functions did not work, and completely connecting the components was not convenient. Therefore, it was decided to design a new board, which will house the logic part (without relays). So I designed 2 PBC and out of two made one.
 
 ![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/Schematics.png?raw=true)
-![pic2](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/pcb1.png?raw=true)
+
+[PCB](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/pcb1.png?raw=true)
 
 ### Stages in creating a printed circuit board
 ![pic](https://github.com/dDenVil/Microclimate_control_system_as_diploma_work/blob/main/readme_assets/steps.png?raw=true)
@@ -120,7 +143,8 @@ On one side there will be a hole for a microclimate control device. The glass pa
 
 ## Conclusions
 
-This was very fast review, I didn't even had to translate it, because I did for my Enlish lessons later.
+This was very fast review, I didn't even had to translate it, because I did for my Enlish lessons later.    
+
 **Let's have a look what choices was good:**
 - It was working;
 - During writing code, I devided everything on small steps, and later just composed it;
@@ -130,5 +154,23 @@ This was very fast review, I didn't even had to translate it, because I did for 
 - It was working only as stand;
 - Big amount of cheap female header connectors didn't give a stable connection  (falling appart);
 - Splitted PCB on 2 parts (falling appart); 
-- Bad and weak power supplies (it could restart because of "huge" load)
-- Code was such a mess, I didn't use funcions enough
+- Bad and weak power supplies (it could restart because of "huge" load);
+- Code was such a mess, I didn't use funcions enough;
+- Excessive components (some of them was unnecessary, like IR-remote).
+
+**How I would do it now:**
+- Change Arduino to ESP8266 (smth that have WI-FI module). And I would have access through telegram bot;
+- Don't try to add everything you can in hardware/software (IR control, SD-card, camera, energy saving, battery mode);
+- Choose functionality as small as you can (I mean don't add battery, if supposed to work from grid);
+- Control panel change to encoder;
+- Use EEPROM to save main parameters;
+- Don't make compositions of 2 PCB, voltage regulator. Make it all on one board;
+- Use good header connectors;
+- Devide code on few files (main, functions, pics);
+- The more simple code the better;
+- Dont' be shy to use resistors;
+- Comment your code;
+- Think about power supply and its power;
+
+Anyway it was my first experience in making smth like this and developing PCB's. Good that I took lessons out of this.
+
