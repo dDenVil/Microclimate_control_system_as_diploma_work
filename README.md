@@ -174,5 +174,5 @@ This was very fast review, I didn't even had to translate it, because I did for 
 - Think about power supply and its power;
 
 Anyway it was my first experience in making smth like this and developing PCB's. Good that I took lessons out of this.
- Here is [full version](Bachelor work. CUTpdf.pdf) of diploma on ukrainian.
+ Here is [full version](Bachelor workCUT.pdf) of diploma on ukrainian.
 
